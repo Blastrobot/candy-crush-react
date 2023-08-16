@@ -1,23 +1,64 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
 
-function App() {
+const width = 8;
+const candyColors = [
+  "blue",
+  "green",
+  "orange",
+  "purple",
+  "red",
+  "yellow"
+]
+
+const App = () => {
+  const [currentCandyArrangement, setCurrentCandyArrangement] = useState();
+
+  const createBoard = () => {
+    const randomCandyArrangement = [];
+    for (let i = 0; i < width * width; i++){
+      const randomNumber = Math.floor(Math.random() * candyColors.length);
+      const randomColor = candyColors[randomNumber];
+      randomCandyArrangement.push(randomColor);
+    }
+    setCurrentCandyArrangement(randomCandyArrangement)
+  }
+
+  const checkColumnOfThree = () => {
+    for (let i = 0; i < 47; i++) {
+      const columnOfThree = [i, i + width, i + width * 2];
+      const matchColor = currentCandyArrangement[i];
+
+      if ( columnOfThree.every(candy => currentCandyArrangement[candy] === matchColor)) {
+        columnOfThree.forEach(candy => currentCandyArrangement[candy] = "")
+      }
+    }
+  }
+
+  useEffect(() => {
+    createBoard();s
+  }, [])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      checkColumnOfThree()
+      setCurrentCandyArrangement([...currentCandyArrangement])
+    }, 100)
+    return () => clearInterval(timer)
+  }, [checkColumnOfThree])
+
+  console.log(currentCandyArrangement)
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <div className="game">
+        {currentCandyArrangement?.map((candyColor, index) => (
+          <img
+            key={index}
+            style={{backgroundColor: candyColor}}
+            alt={candyColor}
+          />)
+        )}
+      </div>
     </div>
   );
 }
